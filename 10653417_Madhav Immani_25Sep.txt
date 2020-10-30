@@ -1,0 +1,126 @@
+-- 1) Display full name of employee
+
+select * from Employees
+
+select lastname,firstname,(lastname + firstname) 'Full Name' from Employees
+
+-- 2) Display the customer details who has fax number
+
+select * from Customers
+
+select * from Customers where Fax is not null
+
+-- 3) Display the customer details whose name holds second letter as U
+
+select * from Customers where ContactName like '_u%'
+
+-- 4) Select order Details where unit price is greater than 10 and less than 20
+
+select * from [Order Details]
+
+select * from [Order Details] where unitprice>10 and UnitPrice<20
+
+-- 5. Display order details which contains shipping date and arrange the order by date
+
+select * from Orders
+
+select * from Orders where ShippedDate is not null order by ShippedDate
+
+-- 6. Print the orders shipped by ship name 'La corne d'abondance' between 2 dates(Choose dates of your choice)
+
+select * from Orders where ShipName like '%la corne d%abondance%'
+
+select * from Orders where (ShipName like '%la corne d%abondance%')and (shippeddate between '1998-03-01' and '1998-04-30')
+
+-- 7. Print the products supplied by 'Exotic Liquids'
+
+select * from Products
+
+select * from Suppliers
+
+select p.* , s.*
+from  Products p, Suppliers s
+where (p.SupplierID=s.SupplierID) and (CompanyName like 'Exotic Liquids')
+
+
+----8. print the average quantity ordered for every product
+
+select * from Products
+
+select  ProductName,avg(UnitsOnOrder) as [average quantity ordered for every product] from Products
+
+group by ProductName
+having avg(UnitsOnOrder)>0
+
+---9. Print all the Shipping company name and the ship names if they are operational
+
+select * from Suppliers
+
+select * from Shippers
+
+select Shipname,CompanyName from 
+Orders o
+join 
+Shippers s
+on
+o.ShipVia=s.ShipperID
+where o.ShipCountry is not null
+
+
+
+---10. Print all Employees with Manager Name
+
+select * from Employees
+
+select e.FirstName 'Employee Name',m.FirstName 'Manager Name' from employees e 
+inner join
+employees m
+on m.EmployeeID=e.ReportsTo
+
+ 
+---- 11. Print the bill for a given order id .bill should contain Productname, Categoryname,price after discount
+
+select * from Orders 
+select * from [Order Details]
+select * from Products
+select * from Categories
+
+select ProductName,CategoryName,(([Order Details].UnitPrice*[Order Details].Quantity)-[Order Details].Discount) from Orders
+left join
+[Order Details]
+on
+Orders.OrderID=[Order Details].OrderID
+left join Products
+on
+[Order Details].ProductID=Products.ProductID
+left join Categories
+on
+Products.CategoryID=Categories.CategoryID
+where [Order Details].OrderID=10250
+
+select * from [Order Details] where OrderID=10250
+
+
+----12. Print the Total price of orders which have the products supplied by 'Exotic Liquids' if the price is > 50 and also print it by Shipping company's Name
+
+
+
+ select odt.UnitPrice*odt.Quantity-odt.Discount*(odt.UnitPrice*odt.Quantity) [Total Price],
+ s.CompanyName [Company Name] from Shippers s 
+inner join 
+Orders o 
+on 
+s.ShipperID = o.ShipVia 
+inner join 
+[Order Details] odt 
+on 
+o.OrderID = odt.OrderID 
+inner join 
+Products pd 
+On
+ pd.ProductID = odt.ProductID 
+inner join 
+Suppliers sp 
+on 
+pd.SupplierID = sp.SupplierID
+ where sp.CompanyName = 'Exotic Liquids' and odt.UnitPrice*odt.Quantity-odt.Discount*(odt.UnitPrice*odt.Quantity) > 50
